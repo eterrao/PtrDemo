@@ -46,7 +46,12 @@ public class PTRLayout extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if (mContent != null) {
+            measureContentView(mContent, widthMeasureSpec, heightMeasureSpec);
+        }
     }
+
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -84,6 +89,19 @@ public class PTRLayout extends ViewGroup {
 //            }
             mContent.layout(left, top, right, bottom);
         }
+    }
+
+    private void measureContentView(View child,
+                                    int parentWidthMeasureSpec,
+                                    int parentHeightMeasureSpec) {
+        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+        final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+                getPaddingLeft() + getPaddingRight() + lp.leftMargin + lp.rightMargin, lp.width);
+        final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+                getPaddingTop() + getPaddingBottom() + lp.topMargin, lp.height);
+
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
 
     @Override
@@ -177,5 +195,45 @@ public class PTRLayout extends ViewGroup {
 
     private boolean dispatchTouchEventSuper(MotionEvent ev) {
         return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p != null && p instanceof LayoutParams;
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p);
+    }
+
+    @Override
+    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    public static class LayoutParams extends MarginLayoutParams {
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        @SuppressWarnings({"unused"})
+        public LayoutParams(MarginLayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
+        }
     }
 }
